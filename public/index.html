@@ -1,0 +1,2682 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="libraryApp">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Crescent University Digital Library</title>
+
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.2/angular.min.js"></script>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f9;
+            color: #333;
+        }
+
+        /* =========================
+           LOGIN
+        ========================= */
+
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+        }
+
+        .login-box {
+            width: 380px;
+            background: white;
+            padding: 35px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .login-box h1 {
+            text-align: center;
+            margin-bottom: 10px;
+            color: #1e3c72;
+        }
+
+        .login-box p {
+            text-align: center;
+            color: #777;
+            margin-bottom: 25px;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+            background: #1e3c72;
+            color: white;
+            padding: 18px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* =========================
+           NAVBAR
+        ========================= */
+
+        .navbar {
+            background: white;
+            padding: 12px 25px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .navbar button {
+            background: transparent;
+            color: #1e3c72;
+            border: none;
+            padding: 10px 16px;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: bold;
+        }
+
+        .navbar button:hover {
+            background: #e8eef8;
+        }
+
+        /* =========================
+           CONTAINER
+        ========================= */
+
+        .container {
+            padding: 30px;
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        .page-title {
+            margin-bottom: 25px;
+            color: #1e3c72;
+        }
+
+        /* =========================
+           CARDS
+        ========================= */
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .dashboard-card {
+            text-align: center;
+        }
+
+        .dashboard-card h2 {
+            font-size: 35px;
+            color: #1e3c72;
+            margin-bottom: 8px;
+        }
+
+        .dashboard-card p {
+            color: #777;
+        }
+
+        /* =========================
+           FORMS
+        ========================= */
+
+        .form-card {
+            max-width: 700px;
+            margin: auto;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+        }
+
+        input:focus,
+        select:focus {
+            outline: none;
+            border-color: #1e3c72;
+        }
+
+        /* =========================
+           BUTTONS
+        ========================= */
+
+        button {
+            border: none;
+            border-radius: 6px;
+            padding: 10px 16px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .primary-btn {
+            background: #1e3c72;
+            color: white;
+        }
+
+        .primary-btn:hover {
+            background: #16305c;
+        }
+
+        .success-btn {
+            background: #198754;
+            color: white;
+        }
+
+        .success-btn:hover {
+            background: #146c43;
+        }
+
+        .danger-btn,
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .danger-btn:hover,
+        .delete-btn:hover {
+            background: #b02a37;
+        }
+
+        .edit-btn {
+            background: #f0ad4e;
+            color: white;
+            margin-right: 5px;
+        }
+
+        .edit-btn:hover {
+            background: #ec971f;
+        }
+
+        .cancel-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .cancel-btn:hover {
+            background: #565e64;
+        }
+
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        /* =========================
+           TABLE
+        ========================= */
+
+        .table-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            overflow-x: auto;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th {
+            background: #1e3c72;
+            color: white;
+            padding: 13px;
+            text-align: left;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* =========================
+           STATUS
+        ========================= */
+
+        .available {
+            color: #198754;
+            font-weight: bold;
+        }
+
+        .unavailable {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .issued {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .returned {
+            color: #198754;
+            font-weight: bold;
+        }
+
+        /* =========================
+           ACTION BUTTONS
+        ========================= */
+
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        /* =========================
+           EDIT PAGE
+        ========================= */
+
+        .edit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .edit-card {
+            max-width: 750px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        .edit-card h2 {
+            color: #1e3c72;
+            margin-bottom: 25px;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        /* =========================
+           EMPTY MESSAGE
+        ========================= */
+
+        .empty-message {
+            text-align: center;
+            padding: 30px;
+            color: #777;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 900px) {
+
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 10px;
+                text-align: center;
+            }
+
+            .login-box {
+                width: 90%;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body ng-controller="LibraryController">
+
+
+<!-- =====================================================
+     LOGIN PAGE
+===================================================== -->
+
+<div class="login-container" ng-if="!isLoggedIn">
+
+    <div class="login-box">
+
+        <h1>Crescent University Digital Library</h1>
+
+        <p>Administrator Login</p>
+
+        <form ng-submit="login()">
+
+            <div class="form-group">
+
+                <label>Username</label>
+
+                <input
+                    type="text"
+                    ng-model="loginData.username"
+                    placeholder="Enter username"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Password</label>
+
+                <input
+                    type="password"
+                    ng-model="loginData.password"
+                    placeholder="Enter password"
+                    required
+                >
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="primary-btn"
+                style="width:100%;"
+            >
+                Login
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     MAIN APPLICATION
+===================================================== -->
+
+<div ng-if="isLoggedIn">
+
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <h1>📚 Digital Library System</h1>
+
+        <div class="user-area">
+
+            <span>
+                Welcome, {{loggedInUser}}
+            </span>
+
+            <button
+                class="logout-btn"
+                ng-click="logout()"
+            >
+                Logout
+            </button>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- NAVIGATION -->
+
+    <div class="navbar">
+
+       <button
+    ng-if="loggedInRole !== 'student' && loggedInRole !== 'faculty'"
+    ng-click="showPage('dashboard')">
+    🏠 Dashboard
+</button>
+
+        <button ng-click="showPage('books')">
+            📚 Books
+        </button>
+
+        <button ng-if="loggedInRole === 'admin' || loggedInRole === 'library_manager' || loggedInRole === 'librarian'"
+        ng-click="showPage('addBook')">
+    ➕ Add Book
+</button>
+
+        <button ng-if="loggedInRole === 'admin' || loggedInRole === 'principal' || loggedInRole === 'library_manager' || loggedInRole === 'librarian'"
+        ng-click="showPage('members')">
+    👥 Members
+</button>
+
+        <button ng-if="loggedInRole === 'admin' || loggedInRole === 'library_manager' || loggedInRole === 'librarian'"
+        ng-click="showPage('addMember')">
+    ➕ Add Member
+</button>
+
+<button ng-if="loggedInRole === 'admin' || loggedInRole === 'library_manager' || loggedInRole === 'librarian'"
+        ng-click="showPage('addFaculty')">👨‍🏫 Add Faculty</button>
+
+        <button ng-if="loggedInRole === 'admin' || loggedInRole === 'library_manager' || loggedInRole === 'librarian'"
+        ng-click="showPage('issueBook')">
+    📖 Issue Book
+</button>
+
+        <button ng-if="loggedInRole === 'admin' || loggedInRole === 'principal' || loggedInRole === 'library_manager' || loggedInRole === 'librarian'"
+        ng-click="showPage('transactions')">
+    🔄 Transactions
+</button>
+
+    </div>
+
+
+
+    <!-- =================================================
+         DASHBOARD
+    ================================================= -->
+
+    <div
+        class="container"
+        ng-if="currentPage === 'dashboard'"
+    >
+
+        <h2 class="page-title">
+            Dashboard
+        </h2>
+
+
+        <div class="dashboard-grid">
+
+            <div class="card dashboard-card">
+
+                <h2>{{books.length}}</h2>
+
+                <p>Total Books</p>
+
+            </div>
+
+
+            <div class="card dashboard-card">
+
+                <h2>{{members.length}}</h2>
+
+                <p>Total Members</p>
+
+            </div>
+
+
+            <div class="card dashboard-card">
+
+                <h2>{{transactions.length}}</h2>
+
+                <p>Total Transactions</p>
+
+            </div>
+
+
+            <div class="card dashboard-card">
+
+                <h2>{{issuedCount}}</h2>
+
+                <p>Books Currently Issued</p>
+
+            </div>
+
+        </div>
+
+
+        <br>
+
+
+        <div class="card">
+
+            <h2 style="color:#1e3c72; margin-bottom:15px;">
+                Welcome to Digital Library System
+            </h2>
+
+            <p>
+                Use the navigation menu to manage books,
+                members and library transactions.
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================================
+         BOOKS
+    ================================================= -->
+
+    <div
+        class="container"
+        ng-if="currentPage === 'books'"
+    >
+
+        <h2 class="page-title">
+            📚 Books
+        </h2>
+
+
+        <div class="table-card">
+
+            <div class="search-box">
+
+                <input
+                    type="text"
+                    ng-model="bookSearch"
+                    placeholder="🔍 Search books by title, author, category or ISBN..."
+                >
+
+            </div>
+
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Title</th>
+                        <th>Author</th>
+                        <th>Category</th>
+                        <th>ISBN</th>
+                        <th>Quantity</th>
+                        <th>Available</th>
+                        <th>Actions</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    <tr
+                        ng-repeat="book in books | filter:bookSearch"
+                    >
+
+                        <td>{{book.title}}</td>
+
+                        <td>{{book.author}}</td>
+
+                        <td>{{book.category}}</td>
+
+                        <td>{{book.isbn}}</td>
+
+                        <td>{{book.quantity}}</td>
+
+                        <td>
+
+                            <span
+                                ng-if="book.available > 0"
+                                class="available"
+                            >
+                                {{book.available}}
+                            </span>
+
+                            <span
+                                ng-if="book.available === 0"
+                                class="unavailable"
+                            >
+                                0
+                            </span>
+
+                        </td>
+
+
+                        <td>
+
+    <div class="action-buttons">
+
+        <!-- Read PDF -->
+        <a
+            ng-if="book.documentUrl"
+            ng-href="{{book.documentUrl}}"
+            target="_blank"
+            class="success-btn"
+            style="text-decoration:none; display:inline-block;"
+        >
+            📖 Read Book
+        </a>
+
+        <span ng-if="!book.documentUrl">
+            No document
+        </span>
+
+
+        <!-- Admin / Manager / Librarian actions -->
+        <div
+            ng-if="loggedInRole === 'admin' ||
+                   loggedInRole === 'library_manager' ||
+                   loggedInRole === 'librarian'"
+        >
+
+            <button
+                class="edit-btn"
+                ng-click="editBook(book)"
+            >
+                Edit
+            </button>
+
+            <button
+                class="delete-btn"
+                ng-click="deleteBook(book._id)"
+            >
+                Delete
+            </button>
+
+        </div>
+
+    </div>
+
+</td>
+
+                    </tr>
+
+
+                    <tr ng-if="(books | filter:bookSearch).length === 0">
+
+                        <td
+                            colspan="7"
+                            class="empty-message"
+                        >
+                            No books found.
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================================
+         ADD BOOK
+    ================================================= -->
+
+    <div
+        class="container"
+        ng-if="currentPage === 'addBook'"
+    >
+
+        <h2 class="page-title">
+            ➕ Add New Book
+        </h2>
+
+
+        <div class="edit-card">
+
+            <h2>Book Details</h2>
+
+
+            <form ng-submit="addBook()">
+
+                <div class="form-group">
+
+                    <label>Book Title</label>
+
+                    <input
+                        type="text"
+                        ng-model="bookData.title"
+                        placeholder="Enter book title"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Author</label>
+
+                    <input
+                        type="text"
+                        ng-model="bookData.author"
+                        placeholder="Enter author name"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Category</label>
+
+                    <input
+                        type="text"
+                        ng-model="bookData.category"
+                        placeholder="Enter category"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>ISBN</label>
+
+                    <input
+                        type="text"
+                        ng-model="bookData.isbn"
+                        placeholder="Enter ISBN"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Quantity</label>
+
+                    <input
+                        type="number"
+                        min="1"
+                        ng-model="bookData.quantity"
+                        placeholder="Enter quantity"
+                        required
+                    >
+
+                </div>
+<div class="form-group">
+
+    <label>Book Document (PDF)</label>
+
+    <input
+        type="file"
+        id="bookDocument"
+        accept="application/pdf"
+        required
+    >
+
+    <small>
+        Upload the book PDF so students and principal can read it.
+    </small>
+
+</div>
+
+                <div class="button-row">
+
+                    <button
+                        type="submit"
+                        class="success-btn"
+                    >
+                        Add Book
+                    </button>
+
+                    <button
+                        type="button"
+                        class="cancel-btn"
+                        ng-click="showPage('books')"
+                    >
+                        Cancel
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================================
+         EDIT BOOK
+    ================================================= -->
+
+    <div
+        class="container"
+        ng-if="currentPage === 'editBook'"
+    >
+
+        <div class="edit-header">
+
+            <h2 class="page-title">
+                ✏️ Edit Book
+            </h2>
+
+        </div>
+
+
+        <div class="edit-card">
+
+            <h2>
+                Update Book Information
+            </h2>
+
+
+            <form ng-submit="updateBook()">
+
+                <div class="form-group">
+
+                    <label>Book Title</label>
+
+                    <input
+                        type="text"
+                        ng-model="editBookData.title"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Author</label>
+
+                    <input
+                        type="text"
+                        ng-model="editBookData.author"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Category</label>
+
+                    <input
+                        type="text"
+                        ng-model="editBookData.category"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>ISBN</label>
+
+                    <input
+                        type="text"
+                        ng-model="editBookData.isbn"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Total Quantity</label>
+
+                    <input
+                        type="number"
+                        min="1"
+                        ng-model="editBookData.quantity"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Available Copies</label>
+
+                    <input
+                        type="number"
+                        ng-model="editBookData.available"
+                        readonly
+                    >
+
+                </div>
+
+
+                <div class="button-row">
+
+                    <button
+                        type="submit"
+                        class="success-btn"
+                    >
+                        Update Book
+                    </button>
+
+                    <button
+                        type="button"
+                        class="cancel-btn"
+                        ng-click="cancelEdit()"
+                    >
+                        Cancel
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================================
+         MEMBERS
+    ================================================= -->
+
+    <div
+        class="container"
+        ng-if="currentPage === 'members'"
+    >
+
+        <h2 class="page-title">
+            👥 Members
+        </h2>
+
+
+        <div class="table-card">
+
+            <div class="search-box">
+
+                <input
+                    type="text"
+                    ng-model="memberSearch"
+                    placeholder="🔍 Search members by name, email, student ID or department..."
+                >
+
+            </div>
+
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Student  / Faculty ID</th>
+                        <th>Department</th>
+                        <th>Type</th>
+                        <th>Actions</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    <tr
+                        ng-repeat="member in members | filter:memberSearch"
+                    >
+
+                        <td>
+                            {{member.name}}
+                        </td>
+
+                        <td>
+                            {{member.email}}
+                        </td>
+
+                        <td>
+                            {{member.phone}}
+                        </td>
+
+                        <td>
+                            {{member.studentId}}
+                        </td>
+
+                        <td>
+                            {{member.department}}
+                        </td>
+<td>
+    {{member.userType}}
+</td>
+
+                        <td>
+
+                            <div class="action-buttons">
+
+                                <button
+                                    class="edit-btn"
+                                    ng-click="editMember(member)"
+                                >
+                                    Edit
+                                </button>
+
+                                <button
+                                    class="delete-btn"
+                                    ng-click="deleteMember(member._id)"
+                                >
+                                    Delete
+                                </button>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+
+                    <tr ng-if="(members | filter:memberSearch).length === 0">
+
+                        <td
+                            colspan="6"
+                            class="empty-message"
+                        >
+                            No members found.
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+<!-- =================================================
+     ADD FACULTY
+================================================= -->
+
+<div
+    class="container"
+    ng-if="currentPage === 'addFaculty'"
+>
+
+    <h2 class="page-title">
+        👨‍🏫 Add New Faculty
+    </h2>
+
+
+    <div class="edit-card">
+
+        <h2>Faculty Details</h2>
+
+
+        <form ng-submit="addFaculty()">
+
+            <div class="form-group">
+
+                <label>Faculty Name</label>
+
+                <input
+                    type="text"
+                    ng-model="facultyData.name"
+                    placeholder="Enter faculty name"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Email</label>
+
+                <input
+                    type="email"
+                    ng-model="facultyData.email"
+                    placeholder="Enter email address"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Phone</label>
+
+                <input
+                    type="text"
+                    ng-model="facultyData.phone"
+                    placeholder="Enter phone number"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Faculty ID</label>
+
+                <input
+                    type="text"
+                    ng-model="facultyData.facultyId"
+                    placeholder="Enter faculty ID"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>Department</label>
+
+                <input
+                    type="text"
+                    ng-model="facultyData.department"
+                    placeholder="Enter department"
+                    required
+                >
+
+            </div>
+
+
+            <div class="button-row">
+
+                <button
+                    type="submit"
+                    class="success-btn"
+                >
+                    Add Faculty
+                </button>
+
+
+                <button
+                    type="button"
+                    class="cancel-btn"
+                    ng-click="showPage('dashboard')"
+                >
+                    Cancel
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+    <!-- =================================================
+         ADD MEMBER
+    ================================================= -->
+
+    <div
+        class="container"
+        ng-if="currentPage === 'addMember'"
+    >
+
+        <h2 class="page-title">
+            ➕ Add New Member
+        </h2>
+
+
+        <div class="edit-card">
+
+            <h2>Member Details</h2>
+
+
+            <form ng-submit="addMember()">
+
+                <div class="form-group">
+
+                    <label>Member Name</label>
+
+                    <input
+                        type="text"
+                        ng-model="memberData.name"
+                        placeholder="Enter member name"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Email</label>
+
+                    <input
+                        type="email"
+                        ng-model="memberData.email"
+                        placeholder="Enter email address"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Phone</label>
+
+                    <input
+                        type="text"
+                        ng-model="memberData.phone"
+                        placeholder="Enter phone number"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Student ID</label>
+
+                    <input
+                        type="text"
+                        ng-model="memberData.studentId"
+                        placeholder="Enter student ID"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Department</label>
+
+                    <input
+                        type="text"
+                        ng-model="memberData.department"
+                        placeholder="Enter department"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="button-row">
+
+                    <button
+                        type="submit"
+                        class="success-btn"
+                    >
+                        Add Member
+                    </button>
+
+                    <button
+                        type="button"
+                        class="cancel-btn"
+                        ng-click="showPage('members')"
+                    >
+                        Cancel
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================================
+         EDIT MEMBER
+    ================================================= -->
+
+    <div
+        class="container"
+        ng-if="currentPage === 'editMember'"
+    >
+
+        <h2 class="page-title">
+            ✏️ Edit Member
+        </h2>
+
+
+        <div class="edit-card">
+
+            <h2>
+                Update Member Information
+            </h2>
+
+
+            <form ng-submit="updateMember()">
+
+                <div class="form-group">
+
+                    <label>Member Name</label>
+
+                    <input
+                        type="text"
+                        ng-model="editMemberData.name"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Email</label>
+
+                    <input
+                        type="email"
+                        ng-model="editMemberData.email"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Phone</label>
+
+                    <input
+                        type="text"
+                        ng-model="editMemberData.phone"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Student ID</label>
+
+                    <input
+                        type="text"
+                        ng-model="editMemberData.studentId"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Department</label>
+
+                    <input
+                        type="text"
+                        ng-model="editMemberData.department"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="button-row">
+
+                    <button
+                        type="submit"
+                        class="success-btn"
+                    >
+                        Update Member
+                    </button>
+
+                    <button
+                        type="button"
+                        class="cancel-btn"
+                        ng-click="cancelMemberEdit()"
+                    >
+                        Cancel
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================================
+         ISSUE BOOK
+    ================================================= -->
+
+    <div
+        class="container"
+        ng-if="currentPage === 'issueBook'"
+    >
+
+        <h2 class="page-title">
+            📖 Issue Book
+        </h2>
+
+
+        <div class="edit-card">
+
+            <h2>Issue Book to Member</h2>
+
+
+            <form ng-submit="issueBook()">
+
+                <div class="form-group">
+
+                    <label>Select Book</label>
+
+                    <select
+                        ng-model="issueData.bookId"
+                        required
+                    >
+
+                        <option value="">
+                            -- Select Book --
+                        </option>
+
+                        <option
+                            ng-repeat="book in books"
+                            value="{{book._id}}"
+                            ng-disabled="book.available <= 0"
+                        >
+                            {{book.title}}
+                            (Available: {{book.available}})
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Select Member</label>
+
+                    <select
+                        ng-model="issueData.memberId"
+                        required
+                    >
+
+                        <option value="">
+                            -- Select Member --
+                        </option>
+
+                        <option
+                            ng-repeat="member in members"
+                            value="{{member._id}}"
+                        >
+                            {{member.name}}
+                            - {{member.studentId}}
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label>Due Date</label>
+
+                    <input
+                        type="date"
+                        ng-model="issueData.dueDate"
+                        required
+                    >
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="success-btn"
+                >
+                    Issue Book
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =================================================
+         TRANSACTIONS
+    ================================================= -->
+
+    <div
+        class="container"
+        ng-if="currentPage === 'transactions'"
+    >
+
+        <h2 class="page-title">
+            🔄 Transactions
+        </h2>
+
+
+        <div class="table-card">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Book</th>
+                        <th>Member</th>
+                        <th>Issue Date</th>
+                        <th>Due Date</th>
+                        <th>Return Date</th>
+                        <th>Fine</th>
+                        <th>Status</th>
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    <tr
+                        ng-repeat="transaction in transactions"
+                    >
+
+                        <td>
+                            {{transaction.bookId.title}}
+                        </td>
+
+                        <td>
+                            {{transaction.memberId.name}}
+                        </td>
+
+                        <td>
+                            {{transaction.issueDate | date:'dd-MM-yyyy'}}
+                        </td>
+
+                        <td>
+                            {{transaction.dueDate | date:'dd-MM-yyyy'}}
+                        </td>
+
+                        <td>
+
+                            <span ng-if="transaction.returnDate">
+                                {{transaction.returnDate | date:'dd-MM-yyyy'}}
+                            </span>
+
+                            <span ng-if="!transaction.returnDate">
+                                -
+                            </span>
+
+                        </td>
+
+                        <td>
+                            ₹{{transaction.fine}}
+                        </td>
+
+                        <td>
+
+                            <span
+                                ng-if="transaction.status === 'Issued'"
+                                class="issued"
+                            >
+                                Issued
+                            </span>
+
+                            <span
+                                ng-if="transaction.status === 'Returned'"
+                                class="returned"
+                            >
+                                Returned
+                            </span>
+
+                        </td>
+
+
+                        <td>
+
+                            <button
+                                ng-if="transaction.status === 'Issued'"
+                                class="success-btn"
+                                ng-click="returnBook(transaction._id)"
+                            >
+                                Return
+                            </button>
+
+                            <span
+                                ng-if="transaction.status === 'Returned'"
+                            >
+                                Completed
+                            </span>
+
+                        </td>
+
+                    </tr>
+
+
+                    <tr ng-if="transactions.length === 0">
+
+                        <td
+                            colspan="8"
+                            class="empty-message"
+                        >
+                            No transactions found.
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+</div>
+
+
+
+<!-- =====================================================
+     ANGULARJS
+===================================================== -->
+
+<script>
+
+var app = angular.module("libraryApp", []);
+
+
+app.controller("LibraryController", function($scope, $http) {
+
+
+    /* ==========================================
+       VARIABLES
+    ========================================== */
+
+    $scope.isLoggedIn = false;
+
+    $scope.loggedInUser = "";
+
+    $scope.loggedInRole = "";
+
+    
+
+    $scope.loginData = {};
+
+    $scope.bookData = {};
+
+    $scope.memberData = {};
+
+    $scope.facultyData = {};
+
+    $scope.editBookData = {};
+
+    $scope.editMemberData = {};
+
+    $scope.issueData = {};
+
+    $scope.books = [];
+
+    $scope.members = [];
+
+    $scope.transactions = [];
+
+    $scope.issuedCount = 0;
+
+
+
+    /* ==========================================
+       LOGIN
+    ========================================== */
+
+    $scope.login = function() {
+
+        $http.post(
+            "/api/admin/login",
+            $scope.loginData
+        )
+
+        .then(function(response) {
+
+            alert("Login successful!");
+
+            $scope.isLoggedIn = true;
+
+            $scope.loggedInUser =
+                response.data.admin.username;
+
+                $scope.loggedInRole =
+    response.data.admin.role;
+
+    alert("Your role is: " + $scope.loggedInRole);
+
+            $scope.loginData = {};
+
+            if (
+    response.data.admin.role === "student" ||
+    response.data.admin.role === "faculty"
+) {
+    $scope.currentPage = "books";
+} else {
+    $scope.currentPage = "dashboard";
+}
+
+            loadBooks();
+
+            loadMembers();
+
+            loadTransactions();
+
+        })
+
+        .catch(function(error) {
+
+            alert(
+                error.data &&
+                error.data.message
+                    ? error.data.message
+                    : "Invalid username or password"
+            );
+
+        });
+
+    };
+
+
+
+    /* ==========================================
+       LOGOUT
+    ========================================== */
+
+    $scope.logout = function() {
+
+        $scope.isLoggedIn = false;
+
+        $scope.loggedInUser = "";
+
+        $scope.currentPage = "dashboard";
+
+    };
+
+
+
+    /* ==========================================
+       PAGE NAVIGATION
+    ========================================== */
+
+    $scope.showPage = function(page) {
+
+        $scope.currentPage = page;
+
+        if (page === "books") {
+            loadBooks();
+        }
+
+        if (page === "members") {
+            loadMembers();
+        }
+
+        if (page === "transactions") {
+            loadTransactions();
+        }
+
+    };
+
+
+
+    /* ==========================================
+       LOAD BOOKS
+    ========================================== */
+
+    function loadBooks() {
+
+        $http.get("/api/books")
+
+        .then(function(response) {
+
+            $scope.books = response.data;
+
+        })
+
+        .catch(function(error) {
+
+            console.log(
+                "Error loading books:",
+                error
+            );
+
+        });
+
+    }
+
+
+
+    /* ==========================================
+       ADD BOOK
+    ========================================== */
+
+    $scope.addBook = function() {
+
+    var fileInput =
+        document.getElementById("bookDocument");
+
+    if (
+        !fileInput ||
+        fileInput.files.length === 0
+    ) {
+        alert("Please select a PDF book document.");
+        return;
+    }
+
+    var formData = new FormData();
+
+    formData.append(
+        "title",
+        $scope.bookData.title
+    );
+
+    formData.append(
+        "author",
+        $scope.bookData.author
+    );
+
+    formData.append(
+        "category",
+        $scope.bookData.category
+    );
+
+    formData.append(
+        "isbn",
+        $scope.bookData.isbn
+    );
+
+    formData.append(
+        "quantity",
+        Number($scope.bookData.quantity)
+    );
+
+    formData.append(
+        "document",
+        fileInput.files[0]
+    );
+
+
+    $http.post(
+        "/api/books",
+        formData,
+        {
+            transformRequest: angular.identity,
+
+            headers: {
+                "Content-Type": undefined
+            }
+        }
+    )
+
+    .then(function(response) {
+
+        alert(
+            "Book and PDF added successfully!"
+        );
+
+        $scope.bookData = {};
+
+        fileInput.value = "";
+
+        loadBooks();
+
+        $scope.currentPage = "books";
+
+    })
+
+    .catch(function(error) {
+
+        alert(
+            error.data &&
+            error.data.message
+                ? error.data.message
+                : "Error adding book"
+        );
+
+    });
+
+};
+
+    /* ==========================================
+       EDIT BOOK
+    ========================================== */
+
+    $scope.editBook = function(book) {
+
+        $scope.editBookData = {
+
+            _id: book._id,
+
+            title: book.title,
+
+            author: book.author,
+
+            category: book.category,
+
+            isbn: book.isbn,
+
+            quantity: book.quantity,
+
+            available: book.available
+
+        };
+
+
+        $scope.currentPage = "editBook";
+
+    };
+
+
+
+    /* ==========================================
+       UPDATE BOOK
+    ========================================== */
+
+    $scope.updateBook = function() {
+
+        var issuedBooks =
+            Number($scope.editBookData.quantity) -
+            Number($scope.editBookData.available);
+
+
+        var newQuantity =
+            Number($scope.editBookData.quantity);
+
+
+        if (newQuantity < 1) {
+
+            alert(
+                "Quantity must be at least 1."
+            );
+
+            return;
+
+        }
+
+
+        if (newQuantity < issuedBooks) {
+
+            alert(
+                "Quantity cannot be less than the number of issued books."
+            );
+
+            return;
+
+        }
+
+
+        var newAvailable =
+            newQuantity - issuedBooks;
+
+
+        var updatedBook = {
+
+            title:
+                $scope.editBookData.title,
+
+            author:
+                $scope.editBookData.author,
+
+            category:
+                $scope.editBookData.category,
+
+            isbn:
+                $scope.editBookData.isbn,
+
+            quantity:
+                newQuantity,
+
+            available:
+                newAvailable
+
+        };
+
+
+        $http.put(
+            "/api/books/" +
+            $scope.editBookData._id,
+            updatedBook
+        )
+
+        .then(function(response) {
+
+            alert(
+                "Book updated successfully!"
+            );
+
+            loadBooks();
+
+            $scope.editBookData = {};
+
+            $scope.currentPage = "books";
+
+        })
+
+        .catch(function(error) {
+
+            alert(
+                error.data &&
+                error.data.message
+                    ? error.data.message
+                    : "Error updating book"
+            );
+
+        });
+
+    };
+
+
+
+    /* ==========================================
+       CANCEL BOOK EDIT
+    ========================================== */
+
+    $scope.cancelEdit = function() {
+
+        $scope.editBookData = {};
+
+        $scope.currentPage = "books";
+
+    };
+
+
+
+    /* ==========================================
+       DELETE BOOK
+    ========================================== */
+
+    $scope.deleteBook = function(bookId) {
+
+        if (
+            !confirm(
+                "Are you sure you want to delete this book?"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        $http.delete(
+            "/api/books/" + bookId
+        )
+
+        .then(function(response) {
+
+            alert(
+                "Book deleted successfully!"
+            );
+
+            loadBooks();
+
+        })
+
+        .catch(function(error) {
+
+            alert(
+                error.data &&
+                error.data.message
+                    ? error.data.message
+                    : "Error deleting book"
+            );
+
+        });
+
+    };
+
+
+
+    /* ==========================================
+       LOAD MEMBERS
+    ========================================== */
+
+    function loadMembers() {
+
+        $http.get("/api/members")
+
+        .then(function(response) {
+
+            $scope.members = response.data;
+
+        })
+
+        .catch(function(error) {
+
+            console.log(
+                "Error loading members:",
+                error
+            );
+
+        });
+
+    }
+
+
+
+    /* ==========================================
+       ADD MEMBER
+    ========================================== */
+
+    $scope.addMember = function() {
+
+        var newMember = {
+
+            name:
+                $scope.memberData.name,
+
+            email:
+                $scope.memberData.email,
+
+            phone:
+                $scope.memberData.phone,
+
+            studentId:
+                $scope.memberData.studentId,
+
+            department:
+                $scope.memberData.department
+
+        };
+
+
+        $http.post(
+            "/api/members",
+            newMember
+        )
+
+        .then(function(response) {
+
+            alert(
+                "Member added successfully!\n\n" +
+        "Student Login Details\n\n" +
+        "Username: " +
+        response.data.account.username + "\n" +
+        "Password: " +
+        response.data.account.password + "\n" +
+        "Role: Student"
+            );
+
+            $scope.memberData = {};
+
+            loadMembers();
+
+            $scope.currentPage = "members";
+
+        })
+
+        .catch(function(error) {
+
+            alert(
+                error.data &&
+                error.data.message
+                    ? error.data.message
+                    : "Error adding member"
+            );
+
+        });
+
+    };
+   /* ==========================================
+   ADD FACULTY
+========================================== */
+
+$scope.addFaculty = function() {
+
+    var newFaculty = {
+
+        name:
+            $scope.facultyData.name,
+
+        email:
+            $scope.facultyData.email,
+
+        phone:
+            $scope.facultyData.phone,
+
+        facultyId:
+            $scope.facultyData.facultyId,
+
+        department:
+            $scope.facultyData.department
+
+    };
+
+
+    $http.post(
+        "/api/faculty",
+        newFaculty
+    )
+
+    .then(function(response) {
+
+        alert(
+            "Faculty added successfully!\n\n" +
+            "Faculty Login Details\n\n" +
+            "Username: " +
+            response.data.account.username + "\n" +
+            "Password: " +
+            response.data.account.password + "\n" +
+            "Role: Faculty"
+        );
+
+
+        $scope.facultyData = {};
+
+        $scope.currentPage = "dashboard";
+
+    })
+
+    .catch(function(error) {
+
+        alert(
+            error.data &&
+            error.data.message
+                ? error.data.message
+                : "Error adding faculty"
+        );
+
+    });
+
+}; 
+
+
+
+    /* ==========================================
+       EDIT MEMBER
+    ========================================== */
+
+    $scope.editMember = function(member) {
+
+        $scope.editMemberData = {
+
+            _id: member._id,
+
+            name: member.name,
+
+            email: member.email,
+
+            phone: member.phone,
+
+            studentId: member.studentId,
+
+            department: member.department
+
+        };
+
+
+        $scope.currentPage = "editMember";
+
+    };
+
+
+
+    /* ==========================================
+       UPDATE MEMBER
+    ========================================== */
+
+    $scope.updateMember = function() {
+
+        var updatedMember = {
+
+            name:
+                $scope.editMemberData.name,
+
+            email:
+                $scope.editMemberData.email,
+
+            phone:
+                $scope.editMemberData.phone,
+
+            studentId:
+                $scope.editMemberData.studentId,
+
+            department:
+                $scope.editMemberData.department
+
+        };
+
+
+        $http.put(
+
+            "/api/members/" +
+            $scope.editMemberData._id,
+
+            updatedMember
+
+        )
+
+        .then(function(response) {
+
+            alert(
+                "Member updated successfully!"
+            );
+
+            loadMembers();
+
+            $scope.editMemberData = {};
+
+            $scope.currentPage = "members";
+
+        })
+
+        .catch(function(error) {
+
+            alert(
+                error.data &&
+                error.data.message
+                    ? error.data.message
+                    : "Error updating member"
+            );
+
+        });
+
+    };
+
+
+
+    /* ==========================================
+       CANCEL MEMBER EDIT
+    ========================================== */
+
+    $scope.cancelMemberEdit = function() {
+
+        $scope.editMemberData = {};
+
+        $scope.currentPage = "members";
+
+    };
+
+
+
+    /* ==========================================
+       DELETE MEMBER
+    ========================================== */
+
+    $scope.deleteMember = function(memberId) {
+
+        if (
+            !confirm(
+                "Are you sure you want to delete this member?"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        $http.delete(
+            "/api/members/" + memberId
+        )
+
+        .then(function(response) {
+
+            alert(
+                "Member deleted successfully!"
+            );
+
+            loadMembers();
+
+        })
+
+        .catch(function(error) {
+
+            alert(
+                error.data &&
+                error.data.message
+                    ? error.data.message
+                    : "Error deleting member"
+            );
+
+        });
+
+    };
+
+
+
+    /* ==========================================
+       LOAD TRANSACTIONS
+    ========================================== */
+
+    function loadTransactions() {
+
+        $http.get("/api/transactions")
+
+        .then(function(response) {
+
+            $scope.transactions =
+                response.data;
+
+
+            $scope.issuedCount =
+                $scope.transactions.filter(
+                    function(transaction) {
+
+                        return transaction.status === "Issued";
+
+                    }
+                ).length;
+
+        })
+
+        .catch(function(error) {
+
+            console.log(
+                "Error loading transactions:",
+                error
+            );
+
+        });
+
+    }
+
+
+
+    /* ==========================================
+       ISSUE BOOK
+    ========================================== */
+
+    $scope.issueBook = function() {
+
+        var issueRequest = {
+
+            bookId:
+                $scope.issueData.bookId,
+
+            memberId:
+                $scope.issueData.memberId,
+
+            dueDate:
+                $scope.issueData.dueDate
+
+        };
+
+
+        $http.post(
+
+            "/api/transactions/issue",
+
+            issueRequest
+
+        )
+
+        .then(function(response) {
+
+            alert(
+                "Book issued successfully!"
+            );
+
+            $scope.issueData = {};
+
+            loadBooks();
+
+            loadTransactions();
+
+            $scope.currentPage =
+                "transactions";
+
+        })
+
+        .catch(function(error) {
+
+            alert(
+                error.data &&
+                error.data.message
+                    ? error.data.message
+                    : "Error issuing book"
+            );
+
+        });
+
+    };
+
+
+
+    /* ==========================================
+       RETURN BOOK
+    ========================================== */
+
+    $scope.returnBook = function(transactionId) {
+
+        if (
+            !confirm(
+                "Are you sure you want to return this book?"
+            )
+        ) {
+
+            return;
+
+        }
+
+
+        $http.put(
+
+            "/api/transactions/return/" +
+            transactionId
+
+        )
+
+        .then(function(response) {
+
+            var fine =
+                response.data.fine;
+
+
+            if (fine > 0) {
+
+                alert(
+                    "Book returned successfully!\nFine: ₹" +
+                    fine
+                );
+
+            } else {
+
+                alert(
+                    "Book returned successfully!\nNo fine."
+                );
+
+            }
+
+
+            loadBooks();
+
+            loadTransactions();
+
+        })
+
+        .catch(function(error) {
+
+            alert(
+                error.data &&
+                error.data.message
+                    ? error.data.message
+                    : "Error returning book"
+            );
+
+        });
+
+    };
+
+
+});
+
+</script>
+
+
+</body>
+
+</html>
