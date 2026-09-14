@@ -15,43 +15,74 @@ const router = express.Router();
 
 const uploadDir = path.join(__dirname, "../uploads/books");
 
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
+let upload;
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, uploadDir);
-    },
+if (process.env.VERCEL) {
 
-    filename: function (req, file, cb) {
-        const safeName = file.originalname.replace(
-            /[^a-zA-Z0-9.-]/g,
-            "_"
-        );
+    // Vercel: keep uploaded PDF in memory
+    const storage = multer.memoryStorage();
 
-        cb(
-            null,
-            Date.now() + "-" + safeName
-        );
-    }
-});
+    upload = multer({
+        storage: storage,
 
-const upload = multer({
-    storage: storage,
+        fileFilter: function (req, file, cb) {
+            if (file.mimetype === "application/pdf") {
+                cb(null, true);
+            } else {
+                cb(new Error("Only PDF files are allowed."));
+            }
+        },
 
-    fileFilter: function (req, file, cb) {
-        if (file.mimetype === "application/pdf") {
-            cb(null, true);
-        } else {
-            cb(new Error("Only PDF files are allowed."));
+        limits: {
+            fileSize: 20 * 1024 * 1024
         }
-    },
+    });
 
-    limits: {
-        fileSize: 20 * 1024 * 1024
+} else {
+
+    // Local computer: save PDFs to uploads/books
+    if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
     }
-});
+
+    const storage = multer.diskStorage({
+
+        destination: function (req, file, cb) {
+            cb(null, uploadDir);
+        },
+
+        filename: function (req, file, cb) {
+
+            const safeName = file.originalname.replace(
+                /[^a-zA-Z0-9.-]/g,
+                "_"
+            );
+
+            cb(
+                null,
+                Date.now() + "-" + safeName
+            );
+        }
+    });
+
+    upload = multer({
+
+        storage: storage,
+
+        fileFilter: function (req, file, cb) {
+
+            if (file.mimetype === "application/pdf") {
+                cb(null, true);
+            } else {
+                cb(new Error("Only PDF files are allowed."));
+            }
+        },
+
+        limits: {
+            fileSize: 20 * 1024 * 1024
+        }
+    });
+}
 
 
 // ===============================
@@ -59,15 +90,19 @@ const upload = multer({
 // ===============================
 
 router.get("/", async (req, res) => {
+
     try {
+
         const books = await Book.find();
 
         res.json(books);
 
     } catch (error) {
+
         res.status(500).json({
             message: error.message
         });
+
     }
 });
 
@@ -82,6 +117,27 @@ router.post(
     async (req, res) => {
 
         try {
+
+            let documentUrl = "";
+            let documentName = "";
+
+            if (req.file) {
+
+                documentName =
+                    req.file.originalname;
+
+                if (process.env.VERCEL) {
+
+                    // PDF storage on Vercel will be handled later
+                    documentUrl = "";
+
+                } else {
+
+                    documentUrl =
+                        "/uploads/books/" +
+                        req.file.filename;
+                }
+            }
 
             const book = new Book({
 
@@ -101,13 +157,9 @@ router.post(
                     req.body.quantity
                 ),
 
-                documentUrl: req.file
-                    ? "/uploads/books/" + req.file.filename
-                    : "",
+                documentUrl: documentUrl,
 
-                documentName: req.file
-                    ? req.file.originalname
-                    : ""
+                documentName: documentName
             });
 
             const savedBook =
@@ -117,7 +169,12 @@ router.post(
 
         } catch (error) {
 
-            if (req.file) {
+            // Delete local uploaded file if database save fails
+            if (
+                req.file &&
+                !process.env.VERCEL &&
+                req.file.filename
+            ) {
 
                 const uploadedFile =
                     path.join(
@@ -126,13 +183,18 @@ router.post(
                     );
 
                 if (fs.existsSync(uploadedFile)) {
-                    fs.unlinkSync(uploadedFile);
+
+                    fs.unlinkSync(
+                        uploadedFile
+                    );
+
                 }
             }
 
             res.status(400).json({
                 message: error.message
             });
+
         }
     }
 );
@@ -161,6 +223,7 @@ router.put("/:id", async (req, res) => {
             return res.status(404).json({
                 message: "Book not found"
             });
+
         }
 
         res.json(updatedBook);
@@ -170,6 +233,7 @@ router.put("/:id", async (req, res) => {
         res.status(400).json({
             message: error.message
         });
+
     }
 });
 
@@ -194,6 +258,7 @@ router.delete("/:id", async (req, res) => {
                 message:
                     "This book cannot be deleted because it is currently issued. Please return the book first."
             });
+
         }
 
         const deletedBook =
@@ -206,6 +271,7 @@ router.delete("/:id", async (req, res) => {
             return res.status(404).json({
                 message: "Book not found"
             });
+
         }
 
         res.json({
@@ -218,6 +284,7 @@ router.delete("/:id", async (req, res) => {
         res.status(500).json({
             message: error.message
         });
+
     }
 });
 
