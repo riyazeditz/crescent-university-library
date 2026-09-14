@@ -2,6 +2,8 @@ const express = require("express");
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
+const cloudinary = require("../cloudinary");
+const streamifier = require("streamifier");
 
 const Book = require("../models/Book");
 const Transaction = require("../models/Transaction");
@@ -123,21 +125,41 @@ router.post(
 
             if (req.file) {
 
-                documentName =
-                    req.file.originalname;
+    documentName = req.file.originalname;
 
-                if (process.env.VERCEL) {
+    if (process.env.VERCEL) {
 
-                    // PDF storage on Vercel will be handled later
-                    documentUrl = "";
+        const result = await new Promise((resolve, reject) => {
 
-                } else {
-
-                    documentUrl =
-                        "/uploads/books/" +
-                        req.file.filename;
+            const uploadStream = cloudinary.uploader.upload_stream(
+                {
+                    resource_type: "raw",
+                    folder: "digital-library/books",
+                    public_id: Date.now() + "-" + documentName.replace(/[^a-zA-Z0-9.-]/g, "_")
+                },
+                (error, result) => {
+                    if (error) {
+                        reject(error);
+                    } else {
+                        resolve(result);
+                    }
                 }
-            }
+            );
+
+            streamifier
+                .createReadStream(req.file.buffer)
+                .pipe(uploadStream);
+        });
+
+        documentUrl = result.secure_url;
+
+    } else {
+
+        documentUrl =
+            "/uploads/books/" +
+            req.file.filename;
+    }
+}
 
             const book = new Book({
 
