@@ -133,7 +133,7 @@ router.post(
 
             const uploadStream = cloudinary.uploader.upload_stream(
                 {
-                    resource_type: "raw",
+                    resource_type: "image",
                     folder: "digital-library/books",
                     public_id: Date.now() + "-" + documentName.replace(/[^a-zA-Z0-9.-]/g, "_")
                 },
