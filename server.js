@@ -74,7 +74,9 @@ app.get("/", (req, res) => {
 // ===============================
 
 mongoose
-    .connect(process.env.MONGO_URI)
+    .connect(process.env.MONGO_URI, {
+        serverSelectionTimeoutMS: 10000
+    })
 
     .then(() => {
 
@@ -84,10 +86,17 @@ mongoose
 
     .catch((error) => {
 
-        console.log(
-            "MongoDB connection failed:",
-            error.message
-        );
+        console.error("MongoDB connection failed");
+        console.error("Error name:", error.name);
+        console.error("Error message:", error.message);
+        console.error("Error code:", error.code);
+
+        if (error.reason) {
+            console.error(
+                "Connection reason:",
+                error.reason
+            );
+        }
 
     });
 
