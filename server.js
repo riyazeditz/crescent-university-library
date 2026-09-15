@@ -36,6 +36,7 @@ app.use(express.json());
 // ===============================
 
 app.use(express.static("public"));
+
 app.use(
     "/uploads",
     express.static(
@@ -45,17 +46,118 @@ app.use(
 
 
 // ===============================
+// MongoDB Connection
+// ===============================
+
+let mongoConnectionPromise = null;
+
+function connectMongoDB() {
+
+    // Already connected
+    if (mongoose.connection.readyState === 1) {
+        return Promise.resolve();
+    }
+
+    // Connection already in progress
+    if (mongoConnectionPromise) {
+        return mongoConnectionPromise;
+    }
+
+    mongoConnectionPromise = mongoose
+        .connect(
+            process.env.MONGO_URI,
+            {
+                serverSelectionTimeoutMS: 10000
+            }
+        )
+        .then(() => {
+
+            console.log(
+                "MongoDB connected successfully!"
+            );
+
+        })
+        .catch((error) => {
+
+            console.error(
+                "MongoDB connection failed:"
+            );
+
+            console.error(
+                "Error name:",
+                error.name
+            );
+
+            console.error(
+                "Error message:",
+                error.message
+            );
+
+            console.error(
+                "Error code:",
+                error.code
+            );
+
+            mongoConnectionPromise = null;
+
+            throw error;
+        });
+
+    return mongoConnectionPromise;
+}
+
+
+// ===============================
+// MongoDB Middleware
+// ===============================
+
+app.use(async (req, res, next) => {
+
+    try {
+
+        await connectMongoDB();
+
+        next();
+
+    } catch (error) {
+
+        res.status(500).json({
+            message: "MongoDB connection failed"
+        });
+
+    }
+
+});
+
+
+// ===============================
 // API Routes
 // ===============================
 
-app.use("/api/books", bookRoutes);
+app.use(
+    "/api/books",
+    bookRoutes
+);
 
-app.use("/api/members", memberRoutes);
+app.use(
+    "/api/members",
+    memberRoutes
+);
 
-app.use("/api/transactions", transactionRoutes);
+app.use(
+    "/api/transactions",
+    transactionRoutes
+);
 
-app.use("/api/admin", adminRoutes);
-app.use("/api/faculty", facultyRoutes);
+app.use(
+    "/api/admin",
+    adminRoutes
+);
+
+app.use(
+    "/api/faculty",
+    facultyRoutes
+);
 
 
 // ===============================
@@ -64,56 +166,38 @@ app.use("/api/faculty", facultyRoutes);
 
 app.get("/", (req, res) => {
 
-    res.sendFile(__dirname + "/public/index.html");
+    res.sendFile(
+        path.join(
+            __dirname,
+            "public",
+            "index.html"
+        )
+    );
 
 });
-
-
-// ===============================
-// MongoDB Connection
-// ===============================
-
-mongoose
-    .connect(process.env.MONGO_URI, {
-        serverSelectionTimeoutMS: 10000
-    })
-
-    .then(() => {
-
-        console.log("MongoDB connected successfully!");
-
-    })
-
-    .catch((error) => {
-
-        console.error("MongoDB connection failed");
-        console.error("Error name:", error.name);
-        console.error("Error message:", error.message);
-        console.error("Error code:", error.code);
-
-        if (error.reason) {
-            console.error(
-                "Connection reason:",
-                error.reason
-            );
-        }
-
-    });
 
 
 // ===============================
 // Start Server
 // ===============================
 
-
 const PORT = process.env.PORT || 5000;
 
 if (!process.env.VERCEL) {
+
     app.listen(PORT, () => {
+
         console.log(
             `Server running on http://localhost:${PORT}`
         );
+
     });
+
 }
+
+
+// ===============================
+// Export App for Vercel
+// ===============================
 
 module.exports = app;
